@@ -6,6 +6,7 @@ import numpy as np
 import scipy
 import operator
 import parser
+import random
 
 
 class Recommender:
@@ -53,6 +54,7 @@ class Recommender:
         except:
             try:
                 user = self.data._user_id_mapping[user_in]
+                return self.recommend_random()
             except:
                 #return "Warning: user id not in the asystem"
                 self.new_user(user_in)
@@ -105,6 +107,11 @@ class Recommender:
         self.data.fit_partial(users=[user])
         self.inv_user_mapping = {v: k for k, v in self.data._user_id_mapping.items()}
         self.inv_item_mapping = {v: k for k, v in self.data._item_id_mapping.items()}
-        print(len(self.model.user_embeddings))
-
+        #print(len(self.model.user_embeddings))
+    def recommend_random(self):
+        rList = random.sample(range(self.n_items),10)
+        recom = {}
+        for i in rList:
+            recom[self.inv_item_mapping[i]] = 0
+        return recom
 #r = Recommender(parser.parser())
