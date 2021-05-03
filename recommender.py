@@ -54,10 +54,10 @@ class Recommender:
         except:
             try:
                 user = self.data._user_id_mapping[user_in]
-                return self.recommend_random()
             except:
                 #return "Warning: user id not in the asystem"
-                self.new_user(user_in)
+                self.new_user(user_in,asset_in)
+                return self.recommend_random()
         if asset_in != None:
             try:
                 asset = int(asset_in)
@@ -103,10 +103,13 @@ class Recommender:
             self.data.fit_partial(items=[x['assetId'] for x in data[1]])
         (interactions,weights) = self.data.build_interactions(data[0])
         self.model.fit_partial(interactions)
-    def new_user(self,user):
+    def new_user(self,user,asset=None):
         self.data.fit_partial(users=[user])
         self.inv_user_mapping = {v: k for k, v in self.data._user_id_mapping.items()}
         self.inv_item_mapping = {v: k for k, v in self.data._item_id_mapping.items()}
+        if asset!=None:
+            (interactions,weights) = self.data.build_interactions([(user,asset)])
+            self.model.fit_partial(interactions)
         #print(len(self.model.user_embeddings))
     def recommend_random(self):
         rList = random.sample(range(self.n_items),10)
