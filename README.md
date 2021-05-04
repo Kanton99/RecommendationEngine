@@ -8,6 +8,13 @@
  - "asset ID key" and "user ID key" are the key to find the user IDs and asset IDs.
 
 
+
+
+
+
+
+
+## Task list
  - [x] è in ascolto su una cartella per i dati prodotto e dati interazione, formato json, andando a controllare se ci sono nuovi file ogni 30 secondi. Quando arrivano i files, li importa automaticamente
  - [ ] includere un README che spiega il formato dei json, con qualche esempio
  - [x] espone un servizio REST per chiedere le raccomandazioni per un utente
