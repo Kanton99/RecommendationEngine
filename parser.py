@@ -4,7 +4,7 @@ import sys
 
 def readConfig():
     with open("config.json","r") as c:
-        config = json.loads(c.readline())
+        config = json.load(c)
         return config
 
 
