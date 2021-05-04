@@ -127,7 +127,7 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
-*.json
+/ml-data-samples/
 *.txt
 
 # Pyre type checker

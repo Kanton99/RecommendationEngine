@@ -39,11 +39,12 @@ class Recommender:
         self.print_interactions()
         self.item_features = self.data.build_item_features((x['assetId'],x['tags']) for x in rData[1])
         self.model = LightFM(loss="warp",item_alpha=0.01)
-        self.model.fit(self.interactions,epochs=50,num_threads=4,item_features=self.item_features)
+        self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features)
 
         self.inv_user_mapping = {v: k for k, v in self.data._user_id_mapping.items()}
         self.inv_item_mapping = {v: k for k, v in self.data._item_id_mapping.items()}
         print("Recommender running")
+    
     def recommend(self,user_in, asset_in=None):
         user = 0
         asset = 0
@@ -56,7 +57,7 @@ class Recommender:
                 user = self.data._user_id_mapping[user_in]
             except:
                 #return "Warning: user id not in the asystem"
-                self.new_user(user_in,asset_in)
+                self.update(([user_in,asset_in],[]))
                 return self.recommend_random()
         if asset_in != None:
             try:
@@ -69,6 +70,11 @@ class Recommender:
                 except:
                     return "Warinig: item id not in the system"
         
+        if asset_in != None:
+            
+            (interactions,weights) = self.data.build_interactions([(self.inv_user_mapping[user],self.inv_item_mapping[asset]),])
+            self.model.fit_partial(interactions,item_features=self.item_features) #da sistemare per efficienza
+            self.print_interactions(user=user,asset=asset)
         recommended = {}
         rItems = 0
         for i in range(self.n_items):
@@ -78,16 +84,14 @@ class Recommender:
                     recommended[self.inv_item_mapping[i]] = prediction
                     rItems+=1
         recommended = dict(sorted(recommended.items(),key=operator.itemgetter(1),reverse=True))
-        if asset_in != None:
-            (interactions,weights) = self.data.build_interactions([(self.inv_user_mapping[user],self.inv_item_mapping[asset]),])
-            self.model.fit_partial(interactions,item_features=self.item_features)
-            self.print_interactions(user=user,asset=asset)
         return recommended
+    
     def validate(self):
         (train, test) = cross_validation.random_train_test_split(self.interactions)
         precision = auc_score(self.model,test,train,item_features= self.item_features)
         for i in precision:
             print("{}\n".format(i))
+    
     def update(self, data):
         """
         Update the engine with new users or videos
@@ -101,20 +105,16 @@ class Recommender:
             self.data.fit_partial(users=[x[0] for x in data[0]],items=[x[1] for x in data[0]])
         if len(data[1])>0:
             self.data.fit_partial(items=[x['assetId'] for x in data[1]])
-        (interactions,weights) = self.data.build_interactions(data[0])
-        self.model.fit_partial(interactions)
-    def new_user(self,user,asset=None):
-        self.data.fit_partial(users=[user])
+        
         self.inv_user_mapping = {v: k for k, v in self.data._user_id_mapping.items()}
         self.inv_item_mapping = {v: k for k, v in self.data._item_id_mapping.items()}
-        if asset!=None:
-            (interactions,weights) = self.data.build_interactions([(user,asset)])
-            self.model.fit_partial(interactions)
-        #print(len(self.model.user_embeddings))
+        (interactions,weights) = self.data.build_interactions(data[0])
+        self.model.fit_partial(interactions)
+    
     def recommend_random(self):
         rList = random.sample(range(self.n_items),10)
         recom = {}
         for i in rList:
             recom[self.inv_item_mapping[i]] = 0
         return recom
-#r = Recommender(parser.parser())
+r = Recommender(parser.parser())
