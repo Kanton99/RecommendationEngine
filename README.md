@@ -23,12 +23,6 @@ By passing also ```-d "assetId=*asset id*"``` the system will also diplay recomm
 
 
 
-## Task list
- - [x] è in ascolto su una cartella per i dati prodotto e dati interazione, formato json, andando a controllare se ci sono nuovi file ogni 30 secondi. Quando arrivano i files, li importa automaticamente
- - [ ] includere un README che spiega il formato dei json, con qualche esempio
- - [x] espone un servizio REST per chiedere le raccomandazioni per un utente
- - [ ] spiegare come usarlo con un dataset di test
- - [ ] deve supportare il cold start (utente visto prima volta)
- - [x] spiegare o, meglio, dare quel minimo di configurabilità sul formato json
+
 
  
