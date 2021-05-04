@@ -2,9 +2,9 @@
 
 ## Usage
  Create an envirnoment, and start test_rest.py. Once it booted up to get a recommendation for a user, do a get call with this format
- '''
+```
  curl -X GET http://localhost:5000/recommend -d "userID=_user id_" 
- '''
+```
 
 
 ### Config File
