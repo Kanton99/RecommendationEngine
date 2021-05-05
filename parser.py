@@ -11,8 +11,7 @@ def readConfig():
 def parser():
     config = readConfig()
 
-    videos = []
-    videos_ids = []
+    assets = []
     users = []
     directory = os.fsdecode(config["data directory location"])
 
@@ -22,10 +21,10 @@ def parser():
             try:
                 with open(os.path.join(directory,filename), 'r') as f:
                     for jsonObj in f:
-                        video = json.loads(jsonObj)
-                        if video not in videos:
-                            videos.append(video)
-                            videos_ids.append(video[config["asset ID key"]])
+                        asset = json.loads(jsonObj)
+                        if asset not in assets:
+                            assets.append(asset)
+                            asset['tags'] = asset[config['asset tags']]
             except:
                 print(filename +": "+sys.exc_info()[0])
         if filename.startswith(config["user Interacion File Patter"]):
@@ -34,16 +33,16 @@ def parser():
                     for jsonObj in f:
                         interaction = json.loads(jsonObj)
                         userId = interaction.get(config["user ID key"])
-                        video = interaction.get(config["asset ID key"])
-                        if (userId, video) not in users:
-                            users.append((userId, video))
+                        asset = interaction.get(config["asset ID key"])
+                        if (userId, asset) not in users:
+                            users.append((userId, asset))
             except:
                 print(filename +": "+sys.exc_info()[0])
         
-    return (users, videos)
+    return (users, assets)
 
 def file_parser(file):
-    videos = []
+    assets = []
     interactions = []
     comps = str(file).split('/')
     if comps[len(comps)-1].startswith("interactions_users"):
@@ -55,6 +54,6 @@ def file_parser(file):
                 if (user,asset) not in interactions:
                     interactions.append((user,asset))
 
-    return (interactions,videos)            
+    return (interactions,assets)            
 
 
