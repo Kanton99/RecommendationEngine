@@ -13,8 +13,12 @@ By passing also ```-d "assetId=*asset id*"``` the system will also diplay recomm
 The data files supplied to the system must be .json files, and there must be two kinds:
  1 Interaction files, where are written user-asset interactions, with at least user id and asset id per interaction
  2 Asset files, where is stored the asset data data, with at least the asset id
+#### Example
+interaction file name: interactions_#####.json
+interaction file format: {"user_id":"#######","asset_id":"##########"}
 
-
+video file name: video_#######.json
+video file format:{"asset_id":"###########","tags":["t1","t2","t3"]}
 
 ### Config File
  - The config file can be changed to fit whatever json files you use.
