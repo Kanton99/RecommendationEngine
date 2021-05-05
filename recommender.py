@@ -57,7 +57,7 @@ class Recommender:
                 user = self.data._user_id_mapping[user_in]
             except:
                 #return "Warning: user id not in the asystem"
-                self.update(([user_in,asset_in],[]))
+                #self.update(([user_in,asset_in],[]))
                 return self.recommend_random()
         if asset_in != None:
             try:
@@ -69,21 +69,17 @@ class Recommender:
                     asset = self.data._item_id_mapping[asset_in]
                 except:
                     return "Warinig: item id not in the system"
-        
-        if asset_in != None:
-            
+
             (interactions,weights) = self.data.build_interactions([(self.inv_user_mapping[user],self.inv_item_mapping[asset]),])
             self.model.fit_partial(interactions,item_features=self.item_features) #da sistemare per efficienza
             self.print_interactions(user=user,asset=asset)
         recommended = {}
-        rItems = 0
         for i in range(self.n_items):
             if i != asset:
                 prediction = float(self.model.predict(user,np.array([i,]),item_features=self.item_features))
-                if rItems < 10:
-                    recommended[self.inv_item_mapping[i]] = prediction
-                    rItems+=1
-        recommended = dict(sorted(recommended.items(),key=operator.itemgetter(1),reverse=True))
+                recommended[self.inv_item_mapping[i]] = prediction
+        recommended = dict(sorted(recommended.items(),key=operator.itemgetter(1),reverse=True)[:10])
+
         return recommended
     
     def validate(self):
