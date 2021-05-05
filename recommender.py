@@ -40,9 +40,8 @@ class Recommender:
         self.item_features = self.data.build_item_features((x['assetId'],x['tags']) for x in rData[1])
         self.model = LightFM(loss="warp",item_alpha=0.01)
         self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features)
-
-        self.inv_user_mapping = {v: k for k, v in self.data._user_id_mapping.items()}
-        self.inv_item_mapping = {v: k for k, v in self.data._item_id_mapping.items()}
+        self.inv_user_mapping = {v: k for k, v in (self.data.mapping()[0].items())}
+        self.inv_item_mapping = {v: k for k, v in (self.data.mapping()[2].items())}
         print("Recommender running")
     
     def recommend(self,user_in, asset_in=None):
@@ -58,7 +57,10 @@ class Recommender:
             except:
                 #return "Warning: user id not in the asystem"
                 #self.update(([user_in,asset_in],[]))
-                return self.recommend_random()
+                if(False or asset_in != None):
+                    self.update(([(user_in,asset_in)],[]))
+                else:
+                    return self.recommend_random()
         if asset_in != None:
             try:
                 asset = int(asset_in)
@@ -73,6 +75,7 @@ class Recommender:
             (interactions,weights) = self.data.build_interactions([(self.inv_user_mapping[user],self.inv_item_mapping[asset]),])
             self.model.fit_partial(interactions,item_features=self.item_features) #da sistemare per efficienza
             self.print_interactions(user=user,asset=asset)
+        
         recommended = {}
         for i in range(self.n_items):
             if i != asset:
@@ -94,16 +97,15 @@ class Recommender:
 
         Parameters
         --------------------------------
-        users = iterable if user ids
-        videos = iterable of video ids
+        data = tuple of the form (iterable of interactions, iterable of videos)
         """
         if len(data[0])>0:
             self.data.fit_partial(users=[x[0] for x in data[0]],items=[x[1] for x in data[0]])
         if len(data[1])>0:
             self.data.fit_partial(items=[x['assetId'] for x in data[1]])
         
-        self.inv_user_mapping = {v: k for k, v in self.data._user_id_mapping.items()}
-        self.inv_item_mapping = {v: k for k, v in self.data._item_id_mapping.items()}
+        self.inv_user_mapping = {v: k for k, v in self.data.mapping()[0].items()}
+        self.inv_item_mapping = {v: k for k, v in self.data.mapping()[2].items()}
         (interactions,weights) = self.data.build_interactions(data[0])
         self.model.fit_partial(interactions)
     
@@ -113,4 +115,4 @@ class Recommender:
         for i in rList:
             recom[self.inv_item_mapping[i]] = 0
         return recom
-r = Recommender(parser.parser())
+#r = Recommender(parser.parser())
