@@ -115,4 +115,4 @@ class Recommender:
         for i in rList:
             recom[self.inv_item_mapping[i]] = 0
         return recom
-#r = Recommender(parser.parser())
+r = Recommender(parser.parser())
