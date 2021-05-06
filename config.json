@@ -1,9 +1,11 @@
 {
-    "use_movielens":true,
+    "use_movielens":false,
     "data_directory_location":"./ml-data-samples/new_data",
     "item_data_file_pattern":"videos",
     "user_interaction_file_pattern":"interactions_users",
+    "user_data_file_pattern":"",
     "user_id_key":"userId",
-    "item_id_key":"itemId",
-    "item_tags":"tags"
+    "item_id_key":"assetId",
+    "item_tags":"tags",
+    "user_tags":""
 }

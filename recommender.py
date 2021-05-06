@@ -19,9 +19,11 @@ class Recommender:
     data = Dataset()
     top = {}
     ml = False
-    def __init__(self, rData,movielens=False):
-        self.ml = movielens
-        if movielens:
+    config = {}
+    def __init__(self, rData):
+        self.config = parser.readConfig()
+        self.ml = self.config['use_movielens']
+        if self.ml:
             self.interactions = rData['train']
             self.item_features = rData['item_features']
             self.model = LightFM(loss="warp")
@@ -33,14 +35,20 @@ class Recommender:
                 self.inv_item_mapping[i] = rData['item_labels'][i]
         else:
             self.data.fit(users=[x[0] for x in rData[0]],items=[x[1] for x in rData[0]])
-            tags_list = [x['tags'] for x in rData[1]]
-            features = [j for sub in tags_list for j in sub]
-            self.data.fit_partial(items=(x['itemId'] for x in rData[1]),item_features=features)
+            item_tag_list = [x[self.config['item_tags']] for x in rData[1]]
+            iFeatures = [j for sub in item_tag_list for j in sub]
+            user_tag_list = [x[self.config['user_tags']] for x in rData[2]]
+            uFeatures = [j for sub in user_tag_list for j in sub]
+            if len(iFeatures)>0:
+                self.data.fit_partial(items=(x[self.config['item_id_key']] for x in rData[1]),item_features=iFeatures)
+            if len(uFeatures)>0:
+                self.data.fit_partial(users=(x[self.config['user_id_key']] for x in rData[2]),user_features=uFeatures)
             self.n_users, self.n_items = self.data.interactions_shape()
             (self.interactions, weights) = self.data.build_interactions([(x[0],x[1]) for x in rData[0]])
-            self.item_features = self.data.build_item_features((x['itemId'],x['tags']) for x in rData[1])
+            self.item_features = self.data.build_item_features((x[self.config['item_id_key']],x[self.config['item_tags']]) for x in rData[1])
+            self.user_features = self.data.build_user_features((x[self.config['user_id_key']],x[self.config['user_tags']]) for x in rData[2])
             self.model = LightFM(loss="warp",item_alpha=0.01)
-            self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features)
+            self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features,user_features=self.user_features)
             self.inv_user_mapping = {v: k for k, v in (self.data.mapping()[0].items())}
             self.inv_item_mapping = {v: k for k, v in (self.data.mapping()[2].items())}
         
@@ -104,7 +112,7 @@ class Recommender:
         if len(data[0])>0:
             self.data.fit_partial(users=[x[0] for x in data[0]],items=[x[1] for x in data[0]])
         if len(data[1])>0:
-            self.data.fit_partial(items=[x['itemId'] for x in data[1]])
+            self.data.fit_partial(items=[x[self.config['item_id_key']] for x in data[1]])
         
         self.inv_user_mapping = {v: k for k, v in self.data.mapping()[0].items()}
         self.inv_item_mapping = {v: k for k, v in self.data.mapping()[2].items()}
@@ -130,5 +138,5 @@ class Recommender:
         top = dict(sorted(top.items(),key=operator.itemgetter(1),reverse=True)[:10])
         return top
 
-# r = Recommender(parser.parser(),True)
-# r.recommend_top()
+r = Recommender(parser.parser())
+print(r.recommend(user_in=0))
