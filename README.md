@@ -41,7 +41,6 @@ user file format: {"user_id":"#########","tags":["t1","t2","t3"]}
  - "item_data_file_pattern" is the pattern to search in the file names to find item data.
  - "user_data_file_pattern" is the pattern to search in the file names to find user data.
  - "user_interaction_file_pattern" is the pattern to search in the file names to find interaction data.
- -  
  - "item_ID_key" and "user_ID_key" are the key to find the user IDs and asset IDs.
  - "item_tags" key in the item jsons to find the item features.
  - "user_tags" key in the user jsons to find the user features.
