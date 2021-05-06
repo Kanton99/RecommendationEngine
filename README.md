@@ -4,7 +4,10 @@
 This API requires to be installed on a Linux distribution and to have Python3.6+ installed
 
 ##Installation
-Clone the repository with ```git clone 
+- Clone the repository with ```git clone https://github.com/Kanton99/RecommendationEngine.git```
+- Create a Python virtual environment with ```python3 -m venv *environment name*```
+- Activate the envirnment with ```source *repository path*/*environment name*/bin/activate```
+- Install the required libraries with ```python3 -m pip install -r requirements.txt```
 
 ## Usage
 Create an envirnoment, and start test_rest.py. Once it booted up to get a recommendation for a user, do a get call with this format
