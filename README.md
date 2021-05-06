@@ -3,7 +3,7 @@
 ##Requirements
 This API requires to be installed on a Linux distribution and to have Python3.6+ installed
 
-##Installation
+## Installation
  1 Clone the repository with ```git clone https://github.com/Kanton99/RecommendationEngine.git```
  2 Create a Python virtual environment with ```python3 -m venv *environment name*```
  3 Activate the envirnment with ```source *repository path*/*environment name*/bin/activate```
