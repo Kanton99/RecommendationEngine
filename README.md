@@ -4,10 +4,10 @@
 This API requires to be installed on a Linux distribution and to have Python3.6+ installed
 
 ## Installation
- 1 Clone the repository with ```git clone https://github.com/Kanton99/RecommendationEngine.git``` 
- 2 Create a Python virtual environment with ```python3 -m venv *environment name*``` 
- 3 Activate the envirnment with ```source *repository path*/*environment name*/bin/activate``` 
- 4 Install the required libraries with ```python3 -m pip install -r requirements.txt``` 
+ 1. Clone the repository with ```git clone https://github.com/Kanton99/RecommendationEngine.git``` 
+ 2. Create a Python virtual environment with ```python3 -m venv *environment name*``` 
+ 3. Activate the envirnment with ```source *repository path*/*environment name*/bin/activate``` 
+ 4. Install the required libraries with ```python3 -m pip install -r requirements.txt``` 
 
 ## Usage
 To use the API start RecommendServer.py. Once it booted up to get a recommendation for a user, do a get call with this format
@@ -19,8 +19,8 @@ By passing also ```-d "assetId=*asset id*"``` the system will also diplay recomm
 
 ### Data files
 The data files supplied to the system must be .json files, and there must be two kinds:
- 1 Interaction files, where are written user-asset interactions, with at least user id and asset id per interaction
- 2 Asset files, where is stored the asset data data, with at least the asset id
+ 1. Interaction files, where are written user-asset interactions, with at least user id and asset id per interaction
+ 2. Asset files, where is stored the asset data data, with at least the asset id
 #### Example
 interaction file name: interactions_#####.json
 interaction file format: {"user_id":"#######","asset_id":"##########"}
