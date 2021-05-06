@@ -31,6 +31,9 @@ interaction file format: {"user_id":"#######","asset_id":"##########"}
 video file name: video_#######.json
 video file format:{"asset_id":"###########","tags":["t1","t2","t3"]}
 
+user file name: user_#######.json
+user file format: {"user_id":"#########","tags":["t1","t2","t3"]}
+
 ### Config File
  - The config file can be changed to fit whatever json files you use.
  - "data directory location" is where are your file stored.
