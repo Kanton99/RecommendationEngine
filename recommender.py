@@ -29,19 +29,32 @@ class Recommender:
                     f.write(" ".join(str(cx[i,j])))
                 f.write('\n')
 
-    def __init__(self, rData):
-        self.data.fit(users=[x[0] for x in rData[0]],items=[x[1] for x in rData[0]])
-        tags_list = [x['tags'] for x in rData[1]]
-        features = [j for sub in tags_list for j in sub]
-        self.data.fit_partial(items=(x['itemId'] for x in rData[1]),item_features=features)
-        self.n_users, self.n_items = self.data.interactions_shape()
-        (self.interactions, weights) = self.data.build_interactions([(x[0],x[1]) for x in rData[0]])
-        self.print_interactions()
-        self.item_features = self.data.build_item_features((x['itemId'],x['tags']) for x in rData[1])
-        self.model = LightFM(loss="warp",item_alpha=0.01)
-        self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features)
-        self.inv_user_mapping = {v: k for k, v in (self.data.mapping()[0].items())}
-        self.inv_item_mapping = {v: k for k, v in (self.data.mapping()[2].items())}
+    def __init__(self, rData,movielens=False):
+        if movielens:
+            self.interactions = rData['train']
+            self.item_features = rData['item_features']
+            self.model = LightFM(loss="warp")
+            self.model.fit(self.interactions,epochs=30)
+            (self.n_users,self.n_items) = self.interactions.shape
+            self.inv_user_mapping = {k: k for k in range(self.n_users)}
+            #self.inv_item_mapping = {v: k for k, v in (rData['item_labels'])}
+            for i in range(self.n_items):
+                self.inv_item_mapping[i] = rData['item_labels'][i]
+        else:
+            self.data.fit(users=[x[0] for x in rData[0]],items=[x[1] for x in rData[0]])
+            tags_list = [x['tags'] for x in rData[1]]
+            features = [j for sub in tags_list for j in sub]
+            self.data.fit_partial(items=(x['itemId'] for x in rData[1]),item_features=features)
+            self.n_users, self.n_items = self.data.interactions_shape()
+            (self.interactions, weights) = self.data.build_interactions([(x[0],x[1]) for x in rData[0]])
+            self.print_interactions()
+            self.item_features = self.data.build_item_features((x['itemId'],x['tags']) for x in rData[1])
+            self.model = LightFM(loss="warp",item_alpha=0.01)
+            self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features)
+            self.inv_user_mapping = {v: k for k, v in (self.data.mapping()[0].items())}
+            self.inv_item_mapping = {v: k for k, v in (self.data.mapping()[2].items())}
+        
+
         print("Recommender running")
     
     def recommend(self,user_in, item_in=None):
@@ -60,7 +73,7 @@ class Recommender:
                 if(False or item_in != None):
                     self.update(([(user_in,item_in)],[]))
                 else:
-                    return self.recommend_random()
+                    return self.recommend_top()
         if item_in != None:
             try:
                 item = int(item_in)
@@ -109,10 +122,6 @@ class Recommender:
         (interactions,weights) = self.data.build_interactions(data[0])
         self.model.fit_partial(interactions)
     
-    def recommend_random(self):
-        rList = random.sample(range(self.n_items),10)
-        recom = {}
-        for i in rList:
-            recom[self.inv_item_mapping[i]] = 0
-        return recom
-r = Recommender(parser.parser())
+    def recommend_top(self):
+        return self.interactions.shape()
+#r = Recommender(parser.parser())

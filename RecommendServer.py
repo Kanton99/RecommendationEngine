@@ -38,8 +38,7 @@ api.add_resource(Watch,'/watcher')
 
 if __name__ == '__main__':
     rData = parser()
-
-    recommender = Recommender(rData)
+    recommender = Recommender(rData,movielens=(len(rData)==5))
     watchdg = listener.Listener(0,"Listener-Thread",recommender)
     try:
         watchdg.start()
