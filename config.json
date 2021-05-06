@@ -1,8 +1,8 @@
 {
     "data directory location":"./ml-data-samples/new_data",
-    "asset Data File Pattern":"videos",
-    "user Interacion File Patter":"interactions_users",
+    "item Data File Pattern":"videos",
+    "user_interaction_file_pattern":"interactions_users",
     "user ID key":"userId",
-    "asset ID key":"assetId",
-    "asset tags":"tags"
+    "item ID key":"itemId",
+    "item tags":"tags"
 }
