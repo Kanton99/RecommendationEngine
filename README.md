@@ -17,6 +17,9 @@ To use the API start RecommendServer.py. Once it booted up to get a recommendati
 and the system will return the top ten recommendation for that user.
 By passing also ```-d "assetId=*asset id*"``` the system will also diplay recommendations related to that asset and add that asset to the list tha assets that the user has interacted with.
 
+### Movielens
+By setting in config.json 'use_movielens' to true the system will use the movielens dataset.
+
 ### Data files
 The data files supplied to the system must be .json files, and there must be two kinds:
  1. Interaction files, where are written user-asset interactions, with at least user id and asset id per interaction
