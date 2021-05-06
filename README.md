@@ -1,6 +1,6 @@
 # Recommendation Engine
 
-##Requirements
+## Requirements
 This API requires to be installed on a Linux distribution and to have Python3.6+ installed
 
 ## Installation
