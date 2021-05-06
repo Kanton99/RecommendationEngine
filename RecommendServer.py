@@ -45,4 +45,4 @@ if __name__ == '__main__':
         watch_running = watchdg.is_alive()
     except KeyboardInterrupt:
         watchdg.join()
-    app.run(debug=True,use_reloader=True)
+    app.run(debug=True,use_reloader=False)

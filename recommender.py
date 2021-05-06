@@ -17,19 +17,10 @@ class Recommender:
     inv_user_mapping = {}
     inv_item_mapping = {}
     data = Dataset()
-
-    def print_interactions(self,user=None,item=None):
-        cx = self.interactions.tolil()
-        if user != None and item != None:
-            cx[user,item] = 1
-        with open("interaction matrix.txt","w") as f:
-            shape = cx.get_shape()
-            for i in range(shape[0]):
-                for j in range(shape[1]):
-                    f.write(" ".join(str(cx[i,j])))
-                f.write('\n')
-
+    top = {}
+    ml = False
     def __init__(self, rData,movielens=False):
+        self.ml = movielens
         if movielens:
             self.interactions = rData['train']
             self.item_features = rData['item_features']
@@ -47,14 +38,13 @@ class Recommender:
             self.data.fit_partial(items=(x['itemId'] for x in rData[1]),item_features=features)
             self.n_users, self.n_items = self.data.interactions_shape()
             (self.interactions, weights) = self.data.build_interactions([(x[0],x[1]) for x in rData[0]])
-            self.print_interactions()
             self.item_features = self.data.build_item_features((x['itemId'],x['tags']) for x in rData[1])
             self.model = LightFM(loss="warp",item_alpha=0.01)
             self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features)
             self.inv_user_mapping = {v: k for k, v in (self.data.mapping()[0].items())}
             self.inv_item_mapping = {v: k for k, v in (self.data.mapping()[2].items())}
         
-
+        self.top = self.recommend_top()
         print("Recommender running")
     
     def recommend(self,user_in, item_in=None):
@@ -63,7 +53,7 @@ class Recommender:
         try:
             user = int(user_in)
             if user >= self.n_users:
-                return "Warning: user non in range"
+                return self.top
         except:
             try:
                 user = self.data._user_id_mapping[user_in]
@@ -73,8 +63,8 @@ class Recommender:
                 if(False or item_in != None):
                     self.update(([(user_in,item_in)],[]))
                 else:
-                    return self.recommend_top()
-        if item_in != None:
+                    return self.top
+        if item_in != None and not self.ml:
             try:
                 item = int(item_in)
                 if item >= self.n_items:
@@ -87,7 +77,6 @@ class Recommender:
 
             (interactions,weights) = self.data.build_interactions([(self.inv_user_mapping[user],self.inv_item_mapping[item]),])
             self.model.fit_partial(interactions,item_features=self.item_features) #da sistemare per efficienza
-            self.print_interactions(user=user,item=item)
         
         recommended = {}
         for i in range(self.n_items):
@@ -123,5 +112,23 @@ class Recommender:
         self.model.fit_partial(interactions)
     
     def recommend_top(self):
-        return self.interactions.shape()
-#r = Recommender(parser.parser())
+        (users,items) = self.interactions.shape
+        arrMat = self.interactions.toarray()
+        #print(arrMat)
+        topV = {v:(0,0) for v in self.inv_item_mapping.values()}
+        iMap = {v: k for k, v in self.inv_item_mapping.items()}
+        #print(iMap)
+        for u in range(users):
+            row = arrMat[u]
+            for i in range(items):
+                if row[i] != 0:
+                    topV[self.inv_item_mapping[i]] = (topV[self.inv_item_mapping[i]][0]+row[i],topV[self.inv_item_mapping[i]][1]+1)
+
+        #top = {k:v[0]/v[1] if v[1] !=0 else v[0] for k, v in topV.items()}
+        top = {k:v[0]/items for k, v in topV.items()}
+        #top.sort(reverse=True)
+        top = dict(sorted(top.items(),key=operator.itemgetter(1),reverse=True)[:10])
+        return top
+
+# r = Recommender(parser.parser(),True)
+# r.recommend_top()
