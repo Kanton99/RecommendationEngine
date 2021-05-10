@@ -23,6 +23,8 @@ class Recommender:
     def __init__(self, rData):
         self.config = parser.readConfig()
         self.ml = self.config['use_movielens']
+
+
         if self.ml:
             self.interactions = rData['train']
             self.item_features = rData['item_features']
@@ -53,6 +55,8 @@ class Recommender:
             self.inv_item_mapping = {v: k for k, v in (self.data.mapping()[2].items())}
         
         self.top = self.recommend_top()
+
+        
         print("Recommender running")
     
     def recommend(self,user_in, item_in=None):
@@ -137,6 +141,3 @@ class Recommender:
         #top.sort(reverse=True)
         top = dict(sorted(top.items(),key=operator.itemgetter(1),reverse=True)[:10])
         return top
-
-r = Recommender(parser.parser())
-print(r.recommend(user_in=0))
