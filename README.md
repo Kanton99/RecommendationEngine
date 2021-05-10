@@ -15,21 +15,21 @@ To use the API start RecommendServer.py. Once it booted up to get a recommendati
 ```curl -X GET http://localhost:5000/recommend -d "userID=*user id*"```
 
 and the system will return the top ten recommendation for that user.
-By passing also ```-d "assetId=*asset id*"``` the system will also diplay recommendations related to that asset and add that asset to the list tha assets that the user has interacted with.
+By passing also ```-d "itemId=*item id*"``` the system will also diplay recommendations related to that item and add that item to the list tha items that the user has interacted with.
 
 ### Movielens
 By setting in config.json 'use_movielens' to true the system will use the movielens dataset.
 
 ### Data files
 The data files supplied to the system must be .json files, and there must be two kinds:
- 1. Interaction files, where are written user-asset interactions, with at least user id and asset id per interaction
- 2. Asset files, where is stored the asset data data, with at least the asset id
+ 1. Interaction files, where are written user-item interactions, with at least user id and item id per interaction
+ 2. item files, where is stored the item data data, with at least the item id
 #### Example
 interaction file name: interactions_#####.json
-interaction file format: {"user_id":"#######","asset_id":"##########"}
+interaction file format: {"user_id":"#######","item_id":"##########"}
 
 video file name: video_#######.json
-video file format:{"asset_id":"###########","tags":["t1","t2","t3"]}
+video file format:{"item_id":"###########","tags":["t1","t2","t3"]}
 
 user file name: user_#######.json
 user file format: {"user_id":"#########","tags":["t1","t2","t3"]}
@@ -41,7 +41,7 @@ user file format: {"user_id":"#########","tags":["t1","t2","t3"]}
  - "item_data_file_pattern" is the pattern to search in the file names to find item data.
  - "user_data_file_pattern" is the pattern to search in the file names to find user data.
  - "user_interaction_file_pattern" is the pattern to search in the file names to find interaction data.
- - "item_ID_key" and "user_ID_key" are the key to find the user IDs and asset IDs.
+ - "item_ID_key" and "user_ID_key" are the key to find the user IDs and item IDs.
  - "item_tags" key in the item jsons to find the item features.
  - "user_tags" key in the user jsons to find the user features.
  

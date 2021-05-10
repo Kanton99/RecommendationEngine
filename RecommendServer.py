@@ -32,6 +32,11 @@ class Watch(Resource):
         else:
             return "watcher is not running"
 
+class Validate(Resource):
+    def get(self):
+        return recommender.validate()
+
+api.add_resource(Validate,"/validate")
 api.add_resource(Recommend, '/recommend')
 api.add_resource(Base,'/')
 api.add_resource(Watch,'/watcher')

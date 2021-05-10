@@ -102,8 +102,12 @@ class Recommender:
     def validate(self):
         (train, test) = cross_validation.random_train_test_split(self.interactions)
         precision = auc_score(self.model,test,train,item_features= self.item_features)
+        returns = {}
+        k = 0
         for i in precision:
-            print("{}\n".format(i))
+            returns[k]=int(i)
+            k+=1
+        return returns
     
     def update(self, data):
         """
