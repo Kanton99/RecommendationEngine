@@ -87,7 +87,7 @@ class Recommender:
                 except:
                     return "Warinig: item id not in the system"
 
-            (interactions,weights) = self.data.build_interactions([(self.inv_user_mapping[user],self.inv_item_mapping[item]),])
+            (interactions,weights) = self.data.build_interactions([(self.inv_user_mapping[user],self.inv_item_mapping[item])])
             self.model.fit_partial(interactions,item_features=self.item_features) #da sistemare per efficienza
         
         recommended = {}
