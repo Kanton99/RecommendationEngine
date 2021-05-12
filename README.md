@@ -13,6 +13,8 @@ This API requires to be installed on a Linux distribution and to have Python3.6+
 To use the API start RecommendServer.py. Once it booted up to get a recommendation for a user, do a get call with this format
 
 ```curl -X GET http://localhost:5000/recommend -d "userID=*user id*"```
+or
+```curl "http://localhost:5000/recommend?userId=*userId*```
 
 and the system will return the top ten recommendation for that user.
 By passing also ```-d "itemId=*item id*"``` the system will also diplay recommendations related to that item and add that item to the list tha items that the user has interacted with.
