@@ -21,6 +21,7 @@ class Recommend(Resource):
         usr = args['userId']
         recomendations = recommender.recommend(usr,itemId)
         return recomendations
+
 class Base(Resource):
     def get(self):
         return "The server is running"     
