@@ -1,6 +1,6 @@
 {
-    "use_movielens":false,
-    "data_directory_location":"./ml-data-samples/new_data",
+    "use_movielens":true,
+    "data_directory_location":"./data",
 
     "item_data_file_pattern":"videos",
     "user_data_file_pattern":"",
