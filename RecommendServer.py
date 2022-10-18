@@ -1,6 +1,6 @@
 import json
 import threading
-from parser import parser
+from parser import FileData
 
 from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
@@ -43,12 +43,12 @@ api.add_resource(Base,'/')
 api.add_resource(Watch,'/watcher')
 
 if __name__ == '__main__':
-    rData = parser()
-    recommender = Recommender(rData)
-    watchdg = listener.Listener(0,"Listener-Thread",recommender)
-    try:
-        watchdg.start()
-        watch_running = watchdg.is_alive()
-    except KeyboardInterrupt:
-        watchdg.join()
+    fileData = FileData()
+    recommender = Recommender(fileData)
+    # watchdg = listener.Listener(0,"Listener-Thread",recommender)
+    # try:
+    #     watchdg.start()
+    #     watch_running = watchdg.is_alive()
+    # except KeyboardInterrupt:
+    #     watchdg.join()
     app.run(debug=True,use_reloader=False)

@@ -1,72 +1,106 @@
 import json
 import os
 import sys
-from lightfm.datasets import fetch_movielens
 
-def readConfig():
-    with open("config.json","r") as c:
-        config = json.load(c)
-        return config
+class FileData:
+    #region configs 
+    movieLens = False
+    dataDirectory = ""
 
-def parser():
-    config = readConfig()
-    if config["use_movielens"]:
-        return fetch_movielens()
+    itemData = ""
+    userData = ""
+    interactionData = ""
+
+    userIdKey = ""
+    itemIdKey = ""
+
+    itemTags = ""
+    userTags = ""
+    #endregion
+    
+    #region interaction data
     items = []
+    users = []
     interactions = []
-    users=[]
-    directory = os.fsdecode(config["data_directory_location"])
+    #endregion
 
-    for file in os.listdir(directory):
-        filename = os.fsdecode(file)
-        if filename.startswith(config["item_data_file_pattern"]):
-            try:
-                with open(os.path.join(directory,filename), 'r') as f:
-                    for jsonObj in f:
-                        item = json.loads(jsonObj)
-                        if item not in items:
-                            items.append(item)
-                            item['tags'] = item[config['item_tags']]
-            except:
-                print(filename +": "+sys.exc_info()[0])
-        if filename.startswith(config["user_interaction_file_pattern"]):
-            try:
-                with open(os.path.join(directory,filename), 'r') as f:
-                    for jsonObj in f:
-                        interaction = json.loads(jsonObj)
-                        userId = interaction.get(config["user_id_key"])
-                        item = interaction.get(config["item_id_key"])
-                        if (userId, item) not in interactions:
-                            interactions.append((userId, item))
-            except:
-                print(filename +": "+sys.exc_info()[0])
-        if len(config['user_data_file_pattern'])>0 and filename.startswith(config["user_interaction_file_pattern"]):
-            try:
-                with open(os.path.join(directory,filename), 'r') as f:
-                    for jsonObj in f:
-                        user = json.loads(jsonObj)
-                        userId = interaction.get(config["user_id_key"])
-                        uTags = interaction.get(config["user_tags"])
-                        if (userId, item) not in interactions:
-                            users.append((userId, item))
-            except:
-                print(filename +": "+sys.exc_info()[0])
-    return (interactions, items, users)
+    def __new__(cls, *ars, **kwargs):
+        return super().__new__(cls)
 
-def file_parser(file):
-    config = readConfig()
-    items = []
-    interactions = []
-    comps = str(file).split('/')
-    if comps[len(comps)-1].startswith(config["user_interaction_file_pattern"]):
-        with open(file,"r") as f:
-            for jsnObj in f:
-                inter = json.loads(jsnObj)
-                user = inter[config["user_id_key"]]
-                item = inter[config["item_id_key"]]
-                if (user,item) not in interactions:
-                    interactions.append((user,item))
+    def __init__(self):
+        self.readConfig()
+        self.parser()
+        pass
 
-    return (interactions,items)            
+    def readConfig(self):
+        config = ""
+        with open("config.json","r") as c:
+            config = json.load(c)
+            #return config
+        
+        self.movieLens = config["use_movielens"]
+        self.dataDirectory = config["data_directory_location"]
+
+        self.itemData = config["item_data_file_pattern"]
+        self.userData = config["user_data_file_pattern"]
+        self.interactionData = config["user_interaction_file_pattern"]
+
+        self.userIdKey = config["user_id_key"]
+        self.itemIdKey = config["item_id_key"]
+
+        self.itemTags = config["item_tags"]
+        self.userTags = config["user_tags"]
+
+    def parser(self):
+        for file in os.listdir(self.dataDirectory):
+            filename = os.fsdecode(file)
+            if filename.startswith(self.itemData):
+                try:
+                    with open(os.path.join(self.dataDirectory,filename), 'r') as f:
+                        for jsonObj in f:
+                            item = json.loads(jsonObj)
+                            if item not in self.items:
+                                self.items.append(item)
+                                item['tags'] = item[self.itemTags]
+                except:
+                    print(filename +": "+sys.exc_info()[0])
+            if filename.startswith(self.interactionData):
+                try:
+                    with open(os.path.join(self.dataDirectory,filename), 'r') as f:
+                        for jsonObj in f:
+                            interaction = json.loads(jsonObj)
+                            userId = interaction.get(self.userIdKey)
+                            item = interaction.get(self.itemIdKey)
+                            if (userId, item) not in self.interactions:
+                                self.interactions.append((userId, item))
+                except:
+                    print(filename +": "+sys.exc_info()[0])
+            if len(self.userData)>0 and filename.startswith(self.interactionData):
+                try:
+                    with open(os.path.join(self.dataDirectory,filename), 'r') as f:
+                        for jsonObj in f:
+                            user = json.loads(jsonObj)
+                            userId = interaction.get(self.userIdKey)
+                            uTags = interaction.get(self.userTags)
+                            if (userId, item) not in self.interactions:
+                                self.users.append((userId, item))
+                except:
+                    print(filename +": "+sys.exc_info()[0])
+
+    def getRecommData(self):
+        return (self.interactions, self.items, self.users)
+
+    def file_parser(self,file):
+        comps = str(file).split('/')
+        if comps[len(comps)-1].startswith(self.interactionData):
+            with open(file,"r") as f:
+                for jsnObj in f:
+                    inter = json.loads(jsnObj)
+                    user = inter[self.userIdKey]
+                    item = inter[self.itemIdKey]
+                    if (user,item) not in self.interactions:
+                        self.interactions.append((user,item))
+
+        return (self.interactions,self.items)            
 
 

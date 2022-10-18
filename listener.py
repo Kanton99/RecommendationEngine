@@ -4,7 +4,7 @@ import sys
 import time
 import recommender
 import threading
-from parser import parser,file_parser
+from parser import FileData
 
 from watchdog.events import *
 from watchdog.events import FileCreatedEvent
