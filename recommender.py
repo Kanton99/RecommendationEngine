@@ -36,25 +36,27 @@ class Recommender:
             self.inv_user_mapping = {k: k for k in range(self.n_users)}
             #self.inv_item_mapping = {v: k for k, v in (rData['item_labels'])}
             for i in range(self.n_items):
-                self.inv_item_mapping[i] = fileData.movieLensData['item_labels'][i]
+                self.inv_item_mapping[i] = mlData['item_labels'][i]
         else:
             self.data.fit(users=self.fileData.users,items=self.fileData.items)
-            item_tag_list = [x[self.fileData.itemTags] for x in rData[1]]
-            iFeatures = [j for sub in item_tag_list for j in sub]
-            user_tag_list = [x[self.fileData.userTags] for x in rData[2]]
-            uFeatures = [j for sub in user_tag_list for j in sub]
 
-            if len(iFeatures)>0:
-                self.data.fit_partial(items=(x[self.fileData.itemIdKey] for x in rData[1]),item_features=iFeatures)
-            if len(uFeatures)>0:
-                self.data.fit_partial(users=(x[self.fileData.userIdKey] for x in rData[2]),user_features=uFeatures)
+            # item_tag_list = [x[self.fileData.itemTags] for x in rData[1]]
+            # iFeatures = [j for sub in item_tag_list for j in sub]
+            # user_tag_list = [x[self.fileData.userTags] for x in rData[2]]
+            # uFeatures = [j for sub in user_tag_list for j in sub]
+
+            # if len(iFeatures)>0:
+            #     self.data.fit_partial(items=(x[self.fileData.itemIdKey] for x in rData[1]),item_features=iFeatures)
+            # if len(uFeatures)>0:
+            #     self.data.fit_partial(users=(x[self.fileData.userIdKey] for x in rData[2]),user_features=uFeatures)
             
             self.n_users, self.n_items = self.data.interactions_shape()
-            (self.interactions, weights) = self.data.build_interactions([(x[0],x[1]) for x in rData[0]])
-            self.item_features = self.data.build_item_features((x[self.fileData.itemIdKey],x[self.fileData.itemTags]) for x in rData[1])
-            self.user_features = self.data.build_user_features((x[self.fileData.userIdKey],x[self.fileData.userTags]) for x in rData[2])
+            (self.interactions, weights) = self.data.build_interactions(self.fileData.interactions)
+            # self.item_features = self.data.build_item_features((x[self.fileData.itemIdKey],x[self.fileData.itemTags]) for x in rData[1])
+            # self.user_features = self.data.build_user_features((x[self.fileData.userIdKey],x[self.fileData.userTags]) for x in rData[2])
             self.model = LightFM(loss="warp",item_alpha=0.01)
-            self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features,user_features=self.user_features)
+            # self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features,user_features=self.user_features)
+            self.model.fit(self.interactions,epochs=1000,num_threads=4)
             self.inv_user_mapping = {v: k for k, v in (self.data.mapping()[0].items())}
             self.inv_item_mapping = {v: k for k, v in (self.data.mapping()[2].items())}
         
