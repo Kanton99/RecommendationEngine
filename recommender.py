@@ -104,6 +104,7 @@ class Recommender:
         # recommended = dict(sorted(recommended.items(),key=operator.itemgetter(1),reverse=True)[:10])
 
         # return recommended
+        user = int(user)
         if(user>self.n_users):
             return self.top
         if(item!=None):
