@@ -69,7 +69,7 @@ class Recommender:
         recommended = {}
         for i in range(self.n_items):
             if i != item:
-                prediction = float(self.model.predict(user,np.array([i,]),item_features=self.item_features))
+                prediction = float(self.model.predict(user,np.array([i,])))
                 recommended[self.inv_item_mapping[i]] = prediction
         recommended = dict(sorted(recommended.items(),key=operator.itemgetter(1),reverse=True)[:10])
 
@@ -97,6 +97,7 @@ class Recommender:
         
         self.inv_user_mapping = {v: k for k, v in self.data.mapping()[0].items()}
         self.inv_item_mapping = {v: k for k, v in self.data.mapping()[2].items()}
+        self.n_users, self.n_items = self.data.interactions_shape()
         (self.interactions,weights) = self.data.build_interactions(interactions)
 
         self.model.fit(self.interactions,epochs=1000,num_threads=4)
