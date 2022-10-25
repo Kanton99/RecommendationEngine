@@ -38,77 +38,33 @@ class Recommender:
             for i in range(self.n_items):
                 self.inv_item_mapping[i] = mlData['item_labels'][i]
         else:
+            #region build dataset
             self.data.fit(users=self.fileData.users,items=self.fileData.items)
 
-            # item_tag_list = [x[self.fileData.itemTags] for x in rData[1]]
-            # iFeatures = [j for sub in item_tag_list for j in sub]
-            # user_tag_list = [x[self.fileData.userTags] for x in rData[2]]
-            # uFeatures = [j for sub in user_tag_list for j in sub]
-
-            # if len(iFeatures)>0:
-            #     self.data.fit_partial(items=(x[self.fileData.itemIdKey] for x in rData[1]),item_features=iFeatures)
-            # if len(uFeatures)>0:
-            #     self.data.fit_partial(users=(x[self.fileData.userIdKey] for x in rData[2]),user_features=uFeatures)
             
             self.n_users, self.n_items = self.data.interactions_shape()
+            #endregion
+            
             (self.interactions, weights) = self.data.build_interactions(self.fileData.interactions)
-            # self.item_features = self.data.build_item_features((x[self.fileData.itemIdKey],x[self.fileData.itemTags]) for x in rData[1])
-            # self.user_features = self.data.build_user_features((x[self.fileData.userIdKey],x[self.fileData.userTags]) for x in rData[2])
+            
+            #region build model
             self.model = LightFM(loss="warp",item_alpha=0.01)
-            # self.model.fit(self.interactions,epochs=1000,num_threads=4,item_features=self.item_features,user_features=self.user_features)
             self.model.fit(self.interactions,epochs=1000,num_threads=4)
+            #endregion
             self.inv_user_mapping = {v: k for k, v in (self.data.mapping()[0].items())}
             self.inv_item_mapping = {v: k for k, v in (self.data.mapping()[2].items())}
         
-        self.top = self.recommend_top()
+        #self.top = self.recommend_top()
 
         
         print("Recommender running")
     
     def recommend(self,user: int, item:int=None):
-        # user = 0
-        # item = 0
-        # try:
-        #     user = int(user_in)
-        #     if user >= self.n_users:
-        #         return self.top
-        # except:
-        #     try:
-        #         user = self.data._user_id_mapping[user_in]
-        #     except:
-        #         #return "Warning: user id not in the asystem"
-        #         #self.update(([user_in,item_in],[]))
-        #         if(False or item_in != None):
-        #             self.update(([(user_in,item_in)],[]))
-        #         else:
-        #             return self.top
-        # if item_in != None and not self.ml:
-        #     try:
-        #         item = int(item_in)
-        #         if item >= self.n_items:
-        #             return "Warning: item non in range"
-        #     except:
-        #         try:
-        #             item = self.data._item_id_mapping[item_in]
-        #         except:
-        #             return "Warinig: item id not in the system"
-
-        #     (interactions,weights) = self.data.build_interactions([(self.inv_user_mapping[user],self.inv_item_mapping[item])])
-        #     self.model.fit_partial(interactions,item_features=self.item_features) #da sistemare per efficienza
-        
-        # recommended = {}
-        # for i in range(self.n_items):
-        #     if i != item:
-        #         prediction = float(self.model.predict(user,np.array([i,]),item_features=self.item_features))
-        #         recommended[self.inv_item_mapping[i]] = prediction
-        # recommended = dict(sorted(recommended.items(),key=operator.itemgetter(1),reverse=True)[:10])
-
-        # return recommended
-        user = int(user)
-        if(user>self.n_users):
-            return self.top
+        # user = int(user)
         if(item!=None):
-            self.update(([(user,item)],[item]))
+            self.update([(user,item)])
+        if(user>self.n_users):
+            return self.recommend_top()
 
         recommended = {}
         for i in range(self.n_items):
@@ -118,14 +74,14 @@ class Recommender:
         recommended = dict(sorted(recommended.items(),key=operator.itemgetter(1),reverse=True)[:10])
 
         return recommended  
-        pass
+ 
     
     def validate(self):
         (train, test) = cross_validation.random_train_test_split(self.interactions)
         precision = auc_score(self.model,test,train,item_features= self.item_features)
         return {"mean":float(precision.mean())}
     
-    def update(self, data):
+    def update(self, interactions, items=[]):
         """
         Update the engine with new users or items
 
@@ -133,15 +89,17 @@ class Recommender:
         --------------------------------
         data = tuple of the form (iterable of interactions, iterable of items)
         """
-        if len(data[0])>0:
-            self.data.fit_partial(users=[x[0] for x in data[0]],items=[x[1] for x in data[0]])
-        if len(data[1])>0:
-            self.data.fit_partial(items=[x[self.config['item_id_key']] for x in data[1]])
+        if len(interactions)>0:
+            self.data.fit_partial(users=[x[0] for x in interactions],items=[x[1] for x in interactions])
+            self.data.fit_partial()
+        if len(items)>0:
+            self.data.fit_partial(items=[x[self.fileData.itemIdKey] for x in items])
         
         self.inv_user_mapping = {v: k for k, v in self.data.mapping()[0].items()}
         self.inv_item_mapping = {v: k for k, v in self.data.mapping()[2].items()}
-        (interactions,weights) = self.data.build_interactions(data[0])
-        self.model.fit_partial(interactions)
+        (self.interactions,weights) = self.data.build_interactions(interactions)
+
+        self.model.fit(self.interactions,epochs=1000,num_threads=4)
     
     def recommend_top(self):
         (users,items) = self.interactions.shape

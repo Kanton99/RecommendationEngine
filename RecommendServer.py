@@ -18,7 +18,8 @@ class Recommend(Resource):
         parser.add_argument('itemId',help='id del video che sta guardando')
         args = parser.parse_args()
         itemId = args['itemId']
-        usr = args['userId']
+        if itemId != None: itemId = int(itemId)
+        usr = int(args['userId'])
         recomendations = recommender.recommend(usr,itemId)
         return recomendations
 

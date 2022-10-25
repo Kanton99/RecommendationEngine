@@ -1,5 +1,5 @@
 {
-    "use_movielens":true,
+    "use_movielens":false,
     "data_directory_location":"./data",
 
     "item_data_file_pattern":"videos",
