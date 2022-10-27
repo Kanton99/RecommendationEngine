@@ -67,6 +67,7 @@ class Recommender:
             return self.recommend_top()
 
         recommended = {}
+        user = self.data.mapping()[0][user]
         for i in range(self.n_items):
             if i != item:
                 prediction = float(self.model.predict(user,np.array([i,])))
