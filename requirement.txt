@@ -8,7 +8,6 @@ idna
 itsdangerous
 Jinja2
 joblib
-lightfm
 MarkupSafe
 numpy
 pytz
@@ -20,3 +19,4 @@ threadpoolctl
 urllib3
 watchdog
 Werkzeug
+lightfm

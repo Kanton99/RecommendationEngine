@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
-FROM python:latest
-WORKDIR /home/anton/python/RS_lightFM/rest_test
+FROM python:3.8.10
 COPY requirement.txt requirement.txt
 RUN pip3 install -r requirement.txt
 COPY . .
-CMD ["python3", "RecommendServer.py"]
+EXPOSE 5000/tcp
+CMD ["python3", "RecommendServer.py", "--host 0.0.0.0"]

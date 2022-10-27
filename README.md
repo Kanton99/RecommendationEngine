@@ -7,17 +7,15 @@ This API requires to be installed on a Linux distribution and to have Python3.6+
  1. Clone the repository with ```git clone https://github.com/Kanton99/RecommendationEngine.git``` 
  2. Create a Python virtual environment with ```python3 -m venv *environment name*``` 
  3. Activate the envirnment with ```source *repository path*/*environment name*/bin/activate``` 
- 4. Install the required libraries with ```python3 -m pip install -r requirements.txt``` 
+ 4. Install the required libraries with ```python3 -m pip install -r requirement.txt``` 
 
 ## Usage
 To use the API start RecommendServer.py. Once it booted up to get a recommendation for a user, do a get call with this format
 
-```curl -X GET http://localhost:5000/recommend -d "userID=*user id*"```\
-or\
-```curl "http://localhost:5000/recommend?userId=*userId*```
+```curl -X GET http://localhost:5000/recommend -H "Content-Type:application/json" -d '{"userId":*user id*}'```
 
 and the system will return the top ten recommendation for that user.
-By passing also ```-d "itemId=*item id*"``` the system will also diplay recommendations related to that item and add that item to the list tha items that the user has interacted with.
+By adding ```"itemId:*item id*``` the system will also diplay recommendations related to that item and add that item to the list tha items that the user has interacted with.
 
 ### Movielens
 By setting in config.json 'use_movielens' to true the system will use the movielens dataset.
