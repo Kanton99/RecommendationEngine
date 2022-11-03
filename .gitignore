@@ -142,4 +142,4 @@ cython_debug/
 /ml-data-samples/
 interaction matrix.txt
 token.txt
-/data
+/data/
