@@ -44,7 +44,6 @@ class Recommender:
             
             self.n_users, self.n_items = self.data.interactions_shape()
             #endregion
-            
             (self.interactions, weights) = self.data.build_interactions(self.fileData.interactions)
             
             #region build model
@@ -93,6 +92,7 @@ class Recommender:
         if len(interactions)>0:
             self.data.fit_partial(users=[x[0] for x in interactions],items=[x[1] for x in interactions])
             self.data.fit_partial()
+            self.fileData.writeInteraction(interactions[0][0],interactions[0][1])
         if len(items)>0:
             self.data.fit_partial(items=[x[self.fileData.itemIdKey] for x in items])
         

@@ -54,7 +54,7 @@ class FileData:
     def parser(self):
         for file in os.listdir(self.dataDirectory):
             filename = os.fsdecode(file)
-            if filename.startswith(self.itemData):
+            if filename == (self.itemData):
                 try:
                     with open(os.path.join(self.dataDirectory,filename), 'r') as f:
                         for jsonObj in f:
@@ -64,13 +64,17 @@ class FileData:
                                 item['tags'] = item[self.itemTags]
                 except:
                     print(filename +": "+sys.exc_info()[0])
-            if filename.startswith(self.interactionData):
+            if filename == (self.interactionData):
                 try:
                     with open(os.path.join(self.dataDirectory,filename), 'r') as f:
                         for jsonObj in f:
                             interaction = json.loads(jsonObj)
                             userId = interaction.get(self.userIdKey)
                             item = interaction.get(self.itemIdKey)
+                            if userId not in self.users:
+                                self.users.append(userId)
+                            if item not in self.items:
+                                self.items.append(item)
                             if (userId, item) not in self.interactions:
                                 self.interactions.append((userId, item))
                 except:
@@ -103,4 +107,15 @@ class FileData:
 
         return (self.interactions,self.items)            
 
-
+    def writeInteraction(self,user,item):
+    
+        # with open(os.path.join(self.dataDirectory,self.interactionData),"r") as file:
+        #     data = json.load(file)
+        # data.append({self.file:user,self.itemIdKey:item})
+        
+        # with open(os.path.join(self.dataDirectory,self.interactionData),"a") as file:
+        #     json.dump(data,file)
+        with open(os.path.join(self.dataDirectory,self.interactionData),"a") as file:
+            data = {self.userIdKey:user,self.itemIdKey:item}
+            json_obj = json.dumps(data,indent=4)
+            file.write(json_obj)

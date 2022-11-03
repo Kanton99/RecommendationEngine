@@ -2,9 +2,9 @@
     "use_movielens":false,
     "data_directory_location":"./data",
 
-    "item_data_file_pattern":"videos",
+    "item_data_file_pattern":"",
     "user_data_file_pattern":"",
-    "user_interaction_file_pattern":"interactions_users",
+    "user_interaction_file_pattern":"interactData.json",
 
     "user_id_key":"userId",
     "item_id_key":"assetId",
