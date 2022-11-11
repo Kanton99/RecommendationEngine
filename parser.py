@@ -62,23 +62,22 @@ class FileData:
                             if item not in self.items:
                                 self.items.append(item)
                                 item['tags'] = item[self.itemTags]
-                except:
-                    print(filename +": "+sys.exc_info()[0])
+                except Exception as e:
+                   print(filename +": "+str(e))
             if filename == (self.interactionData):
                 try:
-                    with open(os.path.join(self.dataDirectory,filename), 'r') as f:
-                        for jsonObj in f:
-                            interaction = json.loads(jsonObj)
-                            userId = interaction.get(self.userIdKey)
-                            item = interaction.get(self.itemIdKey)
-                            if userId not in self.users:
-                                self.users.append(userId)
-                            if item not in self.items:
-                                self.items.append(item)
-                            if (userId, item) not in self.interactions:
-                                self.interactions.append((userId, item))
-                except:
-                    print(filename +": "+sys.exc_info()[0])
+                    with open(os.path.join(self.dataDirectory,filename)) as f:
+                        interactions = json.loads(f.read())["interactions"]
+                        for interaction in interactions:
+                            user = interaction[self.userIdKey]
+                            if user not in self.users: self.users.append(user)
+                            for item in interaction["items"]:
+                                if item not in self.items: self.items.append(item)
+                                if (user, item) not in self.interactions: self.interactions.append((user, item))
+
+                except Exception as e:
+                   print(filename +": "+str(e))
+                   pass
             if len(self.userData)>0 and filename.startswith(self.interactionData):
                 try:
                     with open(os.path.join(self.dataDirectory,filename), 'r') as f:
@@ -88,8 +87,9 @@ class FileData:
                             uTags = interaction.get(self.userTags)
                             if (userId, item) not in self.interactions:
                                 self.users.append((userId, item))
-                except:
-                    print(filename +": "+sys.exc_info()[0])
+                except Exception as e:
+                   print(filename +": "+str(e))
+                   pass
 
     def getRecommData(self):
         return (self.interactions, self.items, self.users)
@@ -115,7 +115,24 @@ class FileData:
         
         # with open(os.path.join(self.dataDirectory,self.interactionData),"a") as file:
         #     json.dump(data,file)
-        with open(os.path.join(self.dataDirectory,self.interactionData),"a") as file:
-            data = {self.userIdKey:user,self.itemIdKey:item}
-            json_obj = json.dumps(data,indent=4)
-            file.write(json_obj)
+            # data = {self.userIdKey:user,self.itemIdKey:item}
+            # json_obj = json.dumps(data,indent=4)
+            # file.write(json_obj)
+
+        if (user,item) not in self.interactions:
+            if item not in self.items: self.items.append(item)
+            inter = {}
+            self.interactions.append((user,item))
+            with open(os.path.join(self.dataDirectory,self.interactionData),"r") as file:
+                inter = json.loads(file.read())
+                if user in self.users:
+                    for interaction in inter["interactions"]:
+                        #interaction = json.loads(interaction)
+                        if user==interaction[self.userIdKey]:
+                            interaction["items"].append(item)
+                else:
+                    self.users.append(user)
+                    interactions = inter["interactions"]
+                    interactions.append({"userId":user,"items":[item]})
+            with open(os.path.join(self.dataDirectory,self.interactionData),"w") as file:
+                json.dump(inter,file)
